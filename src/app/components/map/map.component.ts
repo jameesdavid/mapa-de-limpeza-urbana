@@ -42,7 +42,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   private initMap(): void {
     this.map = L.map('map', {
-      center: [-23.5505, -46.6333],
+      center: [-7.222299490282227, -35.889158248901374],
       zoom: 15
     });
 
@@ -113,15 +113,37 @@ export class MapComponent implements OnInit, OnDestroy {
         weight: 2
       }).addTo(this.map);
 
-      circle.bindPopup(`
-        <div class="popup-content">
-          <strong>Média de Limpeza</strong><br>
-          <span class="rating">${stat.averageRating.toFixed(1)}/10</span><br>
-          <span class="label">${label}</span><br>
-          <small>${stat.totalReports} avaliação(ões)</small><br>
-          <span class="contributors">Avaliado por: ${contributorsList}</span>
-        </div>
-      `);
+      const lastDate = stat.lastEvaluationDate instanceof Date
+        ? stat.lastEvaluationDate
+        : new Date(stat.lastEvaluationDate);
+      const formattedDate = lastDate.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+
+      const tooltipContent = `
+        <strong>Média: ${stat.averageRating.toFixed(1)}/10</strong><br>
+        ${label} · ${stat.totalReports} avaliação(ões)<br>
+        <small>Última: ${formattedDate}</small><br>
+        <small>Por: ${contributorsList}</small>
+      `;
+
+      circle.bindTooltip(tooltipContent, {
+        sticky: true,
+        direction: 'top',
+        className: 'area-tooltip'
+      });
+
+      circle.on('click', (e: L.LeafletMouseEvent) => {
+        if (!this.authService.isLoggedIn()) {
+          this.showLoginRequired.set(true);
+          setTimeout(() => this.showLoginRequired.set(false), 3000);
+          return;
+        }
+        this.selectedLocation.set({ lat: e.latlng.lat, lng: e.latlng.lng });
+        this.showModal.set(true);
+      });
 
       this.areaLayers.push(circle);
     }

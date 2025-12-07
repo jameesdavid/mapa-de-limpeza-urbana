@@ -7,7 +7,7 @@ import {
   query,
   orderBy
 } from '@angular/fire/firestore';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 import { CleanlinessReport, AreaStatistics } from '../models/cleanliness-report.model';
 
 @Injectable({
@@ -38,11 +38,13 @@ export class CleanlinessService {
       lat: number,
       lng: number,
       radius: number,
-      contributors: Set<string>
+      contributors: Set<string>,
+      lastDate: Date
     }>();
 
     for (const report of reports) {
       const key = this.getGridKey(report.latitude, report.longitude);
+      const reportDate = this.toDate(report.timestamp);
 
       if (!areaMap.has(key)) {
         areaMap.set(key, {
@@ -50,7 +52,8 @@ export class CleanlinessService {
           lat: report.latitude,
           lng: report.longitude,
           radius: report.radius,
-          contributors: new Set()
+          contributors: new Set(),
+          lastDate: reportDate
         });
       }
 
@@ -58,6 +61,9 @@ export class CleanlinessService {
       area.ratings.push(report.rating);
       if (report.userName) {
         area.contributors.add(report.userName);
+      }
+      if (reportDate > area.lastDate) {
+        area.lastDate = reportDate;
       }
     }
 
@@ -71,7 +77,8 @@ export class CleanlinessService {
         averageRating: sum / area.ratings.length,
         totalReports: area.ratings.length,
         radius: area.radius,
-        contributors: Array.from(area.contributors)
+        contributors: Array.from(area.contributors),
+        lastEvaluationDate: area.lastDate
       });
     }
 
@@ -83,6 +90,19 @@ export class CleanlinessService {
     const gridLat = Math.floor(lat / gridSize) * gridSize;
     const gridLng = Math.floor(lng / gridSize) * gridSize;
     return `${gridLat.toFixed(3)}_${gridLng.toFixed(3)}`;
+  }
+
+  private toDate(timestamp: unknown): Date {
+    if (timestamp instanceof Date) {
+      return timestamp;
+    }
+    if (timestamp && typeof timestamp === 'object' && 'seconds' in timestamp) {
+      return new Date((timestamp as { seconds: number }).seconds * 1000);
+    }
+    if (typeof timestamp === 'string' || typeof timestamp === 'number') {
+      return new Date(timestamp);
+    }
+    return new Date();
   }
 
   getRatingColor(rating: number): string {

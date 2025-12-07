@@ -183,4 +183,22 @@
       color: #9ca3af;
     }
   }
+
+  .area-tooltip {
+    background: white;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    padding: 8px 12px;
+    font-size: 13px;
+    line-height: 1.4;
+
+    &::before {
+      border-top-color: white;
+    }
+  }
+
+  .leaflet-tooltip-top.area-tooltip::before {
+    border-top-color: white;
+  }
 }
