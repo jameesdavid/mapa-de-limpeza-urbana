@@ -33,7 +33,13 @@ export class CleanlinessService {
   }
 
   calculateAreaStatistics(reports: CleanlinessReport[]): AreaStatistics[] {
-    const areaMap = new Map<string, { ratings: number[], lat: number, lng: number, radius: number }>();
+    const areaMap = new Map<string, {
+      ratings: number[],
+      lat: number,
+      lng: number,
+      radius: number,
+      contributors: Set<string>
+    }>();
 
     for (const report of reports) {
       const key = this.getGridKey(report.latitude, report.longitude);
@@ -43,11 +49,16 @@ export class CleanlinessService {
           ratings: [],
           lat: report.latitude,
           lng: report.longitude,
-          radius: report.radius
+          radius: report.radius,
+          contributors: new Set()
         });
       }
 
-      areaMap.get(key)!.ratings.push(report.rating);
+      const area = areaMap.get(key)!;
+      area.ratings.push(report.rating);
+      if (report.userName) {
+        area.contributors.add(report.userName);
+      }
     }
 
     const statistics: AreaStatistics[] = [];
@@ -59,7 +70,8 @@ export class CleanlinessService {
         longitude: area.lng,
         averageRating: sum / area.ratings.length,
         totalReports: area.ratings.length,
-        radius: area.radius
+        radius: area.radius,
+        contributors: Array.from(area.contributors)
       });
     }
 

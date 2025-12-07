@@ -4,7 +4,7 @@ import * as L from 'leaflet';
 import { CleanlinessService } from '../../services/cleanliness.service';
 import { AuthService } from '../../services/auth.service';
 import { CleanlinessReport, AreaStatistics } from '../../models/cleanliness-report.model';
-import { RatingModalComponent } from '../rating-modal/rating-modal.component';
+import { RatingModalComponent, RatingSubmission } from '../rating-modal/rating-modal.component';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -19,6 +19,7 @@ export class MapComponent implements OnInit, OnDestroy {
   readonly authService = inject(AuthService);
   private map!: L.Map;
   private areaLayers: L.Circle[] = [];
+  private previewCircle: L.Circle | null = null;
   private subscription?: Subscription;
 
   showModal = signal(false);
@@ -26,8 +27,6 @@ export class MapComponent implements OnInit, OnDestroy {
   selectedLocation = signal<{ lat: number; lng: number } | null>(null);
   areaStatistics = signal<AreaStatistics[]>([]);
   isLoading = signal(true);
-
-  private readonly DEFAULT_RADIUS = 500;
 
   ngOnInit(): void {
     this.initMap();
@@ -102,6 +101,9 @@ export class MapComponent implements OnInit, OnDestroy {
     for (const stat of statistics) {
       const color = this.cleanlinessService.getRatingColor(stat.averageRating);
       const label = this.cleanlinessService.getRatingLabel(stat.averageRating);
+      const contributorsList = stat.contributors.length > 0
+        ? stat.contributors.slice(0, 3).join(', ') + (stat.contributors.length > 3 ? '...' : '')
+        : 'Anônimo';
 
       const circle = L.circle([stat.latitude, stat.longitude], {
         radius: stat.radius,
@@ -116,7 +118,8 @@ export class MapComponent implements OnInit, OnDestroy {
           <strong>Média de Limpeza</strong><br>
           <span class="rating">${stat.averageRating.toFixed(1)}/10</span><br>
           <span class="label">${label}</span><br>
-          <small>${stat.totalReports} avaliação(ões)</small>
+          <small>${stat.totalReports} avaliação(ões)</small><br>
+          <span class="contributors">Avaliado por: ${contributorsList}</span>
         </div>
       `);
 
@@ -124,31 +127,61 @@ export class MapComponent implements OnInit, OnDestroy {
     }
   }
 
-  async onRatingSubmitted(rating: number): Promise<void> {
+  onRadiusChanged(radius: number): void {
+    const location = this.selectedLocation();
+
+    if (this.previewCircle) {
+      this.map.removeLayer(this.previewCircle);
+      this.previewCircle = null;
+    }
+
+    if (radius > 0 && location) {
+      this.previewCircle = L.circle([location.lat, location.lng], {
+        radius: radius,
+        fillColor: '#3b82f6',
+        fillOpacity: 0.2,
+        color: '#3b82f6',
+        weight: 2,
+        dashArray: '5, 10'
+      }).addTo(this.map);
+    }
+  }
+
+  async onRatingSubmitted(submission: RatingSubmission): Promise<void> {
     const location = this.selectedLocation();
     const userId = this.authService.userId();
+    const userName = this.authService.userDisplayName();
     if (!location || !userId) return;
 
     const report: Omit<CleanlinessReport, 'id'> = {
       latitude: location.lat,
       longitude: location.lng,
-      rating,
-      radius: this.DEFAULT_RADIUS,
+      rating: submission.rating,
+      radius: submission.radius,
       timestamp: new Date(),
-      userId
+      userId,
+      userName: userName ?? undefined
     };
 
     try {
       await this.cleanlinessService.addReport(report);
-      this.showModal.set(false);
-      this.selectedLocation.set(null);
+      this.closeModalAndCleanup();
     } catch (error) {
       console.error('Error submitting report:', error);
     }
   }
 
   onModalClose(): void {
+    this.closeModalAndCleanup();
+  }
+
+  private closeModalAndCleanup(): void {
     this.showModal.set(false);
     this.selectedLocation.set(null);
+
+    if (this.previewCircle) {
+      this.map.removeLayer(this.previewCircle);
+      this.previewCircle = null;
+    }
   }
 }
