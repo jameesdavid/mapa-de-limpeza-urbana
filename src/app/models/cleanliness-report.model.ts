@@ -6,6 +6,7 @@ export interface CleanlinessReport {
   radius: number;
   timestamp: Date;
   userId?: string;
+  userName?: string;
 }
 
 export interface AreaStatistics {
@@ -14,4 +15,5 @@ export interface AreaStatistics {
   averageRating: number;
   totalReports: number;
   radius: number;
+  contributors: string[];
 }

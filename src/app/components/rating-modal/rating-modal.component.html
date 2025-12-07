@@ -16,7 +16,7 @@
     }
 
     <div class="rating-section">
-      <p class="rating-instruction">Como você avalia a limpeza desta área?</p>
+      <p class="section-label">Como você avalia a limpeza desta área?</p>
 
       <div class="rating-display" [style.color]="getRatingColor(selectedRating())">
         <span class="rating-value">{{ selectedRating() }}</span>
@@ -56,8 +56,31 @@
       </div>
     </div>
 
-    <div class="info-box">
-      <p>Esta avaliação corresponderá a uma área de <strong>1 km</strong> de diâmetro ao redor do ponto selecionado.</p>
+    <div class="radius-section">
+      <p class="section-label">Selecione o raio da área avaliada:</p>
+
+      <div class="radius-display">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <span>{{ getRadiusLabel(selectedRadius()) }}</span>
+      </div>
+
+      <div class="radius-buttons">
+        @for (option of radiusOptions; track option.value) {
+          <button
+            type="button"
+            class="radius-button"
+            [class.selected]="option.value === selectedRadius()"
+            (click)="setRadius(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+
+      <p class="radius-hint">A área selecionada está sendo exibida no mapa</p>
     </div>
 
     <div class="actions">
