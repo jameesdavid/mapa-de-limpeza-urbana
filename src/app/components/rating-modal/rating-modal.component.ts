@@ -29,9 +29,7 @@ export class RatingModalComponent implements OnInit, OnDestroy {
     { value: 100, label: '100m' },
     { value: 250, label: '250m' },
     { value: 500, label: '500m' },
-    { value: 1000, label: '1km' },
-    { value: 2000, label: '2km' },
-    { value: 5000, label: '5km' }
+    { value: 1000, label: '1km' }
   ];
 
   ngOnInit(): void {

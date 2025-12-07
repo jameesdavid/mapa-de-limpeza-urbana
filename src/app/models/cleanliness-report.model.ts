@@ -16,4 +16,5 @@ export interface AreaStatistics {
   totalReports: number;
   radius: number;
   contributors: string[];
+  lastEvaluationDate: Date;
 }
