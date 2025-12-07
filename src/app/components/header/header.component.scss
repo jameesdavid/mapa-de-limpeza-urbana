@@ -1,0 +1,123 @@
+.app-header {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
+  padding: 12px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+  }
+}
+
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .user-name {
+    font-size: 14px;
+    font-weight: 500;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.btn-login {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: white;
+  color: #1f2937;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f3f4f6;
+    transform: translateY(-1px);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.btn-logout {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+@media (max-width: 600px) {
+  .header-content {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .logo h1 {
+    font-size: 16px;
+  }
+
+  .user-info .user-name {
+    display: none;
+  }
+
+  .btn-login {
+    padding: 8px 12px;
+    font-size: 13px;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}

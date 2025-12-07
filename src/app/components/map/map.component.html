@@ -1,0 +1,61 @@
+<div class="map-container">
+  @if (isLoading()) {
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Carregando mapa...</p>
+    </div>
+  }
+
+  <div id="map"></div>
+
+  <div class="legend">
+    <h4>Legenda</h4>
+    <div class="legend-item">
+      <span class="color-box excellent"></span>
+      <span>Excelente (8-10)</span>
+    </div>
+    <div class="legend-item">
+      <span class="color-box good"></span>
+      <span>Bom (6-8)</span>
+    </div>
+    <div class="legend-item">
+      <span class="color-box regular"></span>
+      <span>Regular (4-6)</span>
+    </div>
+    <div class="legend-item">
+      <span class="color-box bad"></span>
+      <span>Ruim (2-4)</span>
+    </div>
+    <div class="legend-item">
+      <span class="color-box terrible"></span>
+      <span>Péssimo (0-2)</span>
+    </div>
+  </div>
+
+  <div class="instructions">
+    @if (authService.isLoggedIn()) {
+      <p>Clique no mapa para avaliar a limpeza de uma área</p>
+    } @else {
+      <p>Faça login para avaliar a limpeza de uma área</p>
+    }
+  </div>
+
+  @if (showLoginRequired()) {
+    <div class="toast-message">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span>Faça login para avaliar esta área</span>
+    </div>
+  }
+</div>
+
+@if (showModal()) {
+  <app-rating-modal
+    [location]="selectedLocation()"
+    (ratingSubmitted)="onRatingSubmitted($event)"
+    (closeModal)="onModalClose()"
+  />
+}

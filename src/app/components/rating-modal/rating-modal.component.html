@@ -1,0 +1,80 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-content">
+    <button class="close-button" (click)="onClose()" aria-label="Fechar">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <h2>Avaliar Limpeza da Área</h2>
+
+    @if (location) {
+      <p class="location-info">
+        Localização: {{ location.lat.toFixed(4) }}, {{ location.lng.toFixed(4) }}
+      </p>
+    }
+
+    <div class="rating-section">
+      <p class="rating-instruction">Como você avalia a limpeza desta área?</p>
+
+      <div class="rating-display" [style.color]="getRatingColor(selectedRating())">
+        <span class="rating-value">{{ selectedRating() }}</span>
+        <span class="rating-label">{{ getRatingLabel(selectedRating()) }}</span>
+      </div>
+
+      <div class="rating-slider">
+        <input
+          type="range"
+          min="0"
+          max="10"
+          step="1"
+          [value]="selectedRating()"
+          (input)="setRating(+$any($event.target).value)"
+          class="slider"
+          [style.--slider-color]="getRatingColor(selectedRating())"
+        />
+        <div class="slider-labels">
+          <span>0</span>
+          <span>5</span>
+          <span>10</span>
+        </div>
+      </div>
+
+      <div class="rating-buttons">
+        @for (rating of ratingOptions; track rating) {
+          <button
+            type="button"
+            class="rating-button"
+            [class.selected]="rating === selectedRating()"
+            [style.--button-color]="getRatingColor(rating)"
+            (click)="setRating(rating)"
+          >
+            {{ rating }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="info-box">
+      <p>Esta avaliação corresponderá a uma área de <strong>1 km</strong> de diâmetro ao redor do ponto selecionado.</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn-cancel" (click)="onClose()">Cancelar</button>
+      <button
+        class="btn-submit"
+        (click)="onSubmit()"
+        [disabled]="isSubmitting()"
+        [style.background-color]="getRatingColor(selectedRating())"
+      >
+        @if (isSubmitting()) {
+          <span class="spinner-small"></span>
+          Enviando...
+        } @else {
+          Enviar Avaliação
+        }
+      </button>
+    </div>
+  </div>
+</div>
